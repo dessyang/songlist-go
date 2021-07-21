@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/gommon/log"
 	"github.com/tidwall/gjson"
-	"github.com/yjymh/songlist-go/model/song"
+	"github.com/yjymh/songlist-go/model"
 	"github.com/yjymh/songlist-go/module/requests"
 	"github.com/yjymh/songlist-go/util"
 	"strings"
@@ -16,11 +16,11 @@ var (
 )
 
 // GetMusicInfoByQQ 通过歌曲名，返回歌手信息
-func GetMusicInfoByQQ(title string) (*song.Info, error) {
+func GetMusicInfoByQQ(title string) (*model.SongInfo, error) {
 	url := baseSearchUrlQQ + strings.Replace(title, " ", "%20", -1)
 	jsonData := requests.GetApiData(url)
 	list := jsonData.Get("data.song.list")
-	songInfo := new(song.Info)
+	songInfo := new(model.SongInfo)
 
 	if list.Raw == "[]" {
 		log.Error("没有找到该歌曲")
@@ -53,13 +53,10 @@ func GetMusicInfoByQQ(title string) (*song.Info, error) {
 }
 
 // 把该链接下的数据提取出来
-func setSongINfo(s string, songInfo *song.Info) {
+func setSongINfo(s string, songInfo *model.SongInfo) {
 	data := gjson.Parse(util.SearchJson(s))
 
 	infoData := data.Get("detail")
-
-	songInfo.AlbumPic = "https:" + infoData.Get("picurl").String() // 专辑或者歌曲图片
-
 	singer := infoData.Get("singer")
 	if singer.IsArray() {
 		var s string
@@ -74,18 +71,6 @@ func setSongINfo(s string, songInfo *song.Info) {
 	}
 
 	songInfo.Album = infoData.Get("albumName").String() // 专辑名
-
-	company := infoData.Get("info.company.content")
-	if company.IsArray() {
-		songInfo.Company = company.Array()[0].Get("value").String() // 唱片公司 有时会空
-	}
-
-	genre := infoData.Get("info.genre.content")
-	if genre.IsArray() {
-		songInfo.Genre = genre.Array()[0].Get("value").String() // 歌曲流派 也可能会空
-	}
-
-	songInfo.Lang = infoData.Get("info.lan.content").Array()[0].Get("value").String() // 语种
 
 	pubTime := infoData.Get("info.pub_time.content")
 	if pubTime.IsArray() {

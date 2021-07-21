@@ -3,12 +3,11 @@ package song_service
 import (
 	"github.com/labstack/gommon/log"
 	"github.com/yjymh/songlist-go/model"
-	"github.com/yjymh/songlist-go/model/song"
 	"github.com/yjymh/songlist-go/module/requests/music"
 )
 
 func AddSongInfo(title string) bool {
-	var songInfo *song.Info
+	var songInfo *model.SongInfo
 
 	model.DB().Where("title=?", title).First(&songInfo)
 
@@ -32,8 +31,8 @@ func AddSongInfo(title string) bool {
 	return true
 }
 
-func QuerySongInfo() (*[]song.Info, error) {
-	var songs *[]song.Info
+func QuerySongInfo() (*[]model.SongInfo, error) {
+	var songs *[]model.SongInfo
 	err := model.DB().Find(&songs).Error
 	if err != nil {
 		return nil, err

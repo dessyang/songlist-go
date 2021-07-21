@@ -1,15 +1,15 @@
 package cache
 
 import (
-	"github.com/yjymh/songlist-go/model/song"
+	"github.com/yjymh/songlist-go/model"
 	"github.com/yjymh/songlist-go/service/song_service"
 )
 
 var (
-	cache *[]song.Info
+	cache *[]model.SongInfo
 )
 
-func Cache() *[]song.Info {
+func Cache() *[]model.SongInfo {
 	var err error
 	if cache == nil {
 		cache, err = NewCache()
@@ -20,7 +20,7 @@ func Cache() *[]song.Info {
 	return cache
 }
 
-func NewCache() (*[]song.Info, error) {
+func NewCache() (*[]model.SongInfo, error) {
 	songs, err := song_service.QuerySongInfo()
 	if err != nil {
 		return nil, err
