@@ -31,8 +31,8 @@ func AddSongInfo(title string) bool {
 	return true
 }
 
-func QuerySongInfo() (*[]model.SongInfo, error) {
-	var songs *[]model.SongInfo
+func QuerySongInfo(user string) ([]model.SongInfo, error) {
+	var songs []model.SongInfo
 	err := model.DB().Find(&songs).Error
 	if err != nil {
 		return nil, err

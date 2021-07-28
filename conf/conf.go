@@ -15,10 +15,15 @@ var (
 )
 
 type config struct {
-	LogLevel string `toml:"log_level"`
-
+	App    app      `toml:"app"`
 	Server server   `toml:"server"`
 	DB     database `toml:"database"`
+}
+
+type app struct {
+	Mode       string `toml:"mode"`
+	PageMaxNum int    `toml:"pageMaxNum"`
+	JwtSecret  string `toml:"jwtSecret"`
 }
 
 type server struct {
@@ -36,8 +41,8 @@ type database struct {
 	Name     string `toml:"name"`
 }
 
-// InitConfig 加载配置文件
-func InitConfig(configFile string) {
+// Setup 加载配置文件
+func Setup(configFile string) {
 	if configFile == "" {
 		configFile = defaultConfigFile
 	}

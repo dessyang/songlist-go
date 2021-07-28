@@ -10,10 +10,10 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	apiv1 := r.Group("/api/v1")
-
+	pubApiV1 := r.Group("/api/v1")
 	{
-		apiv1.GET("/songs", v1.GetSongList)
+		pubApiV1.GET("/songs/:name", v1.GetSongList)
 	}
+
 	return r
 }
