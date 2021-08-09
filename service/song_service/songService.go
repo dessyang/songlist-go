@@ -6,6 +6,7 @@ import (
 	"github.com/yjymh/songlist-go/module/requests/music"
 )
 
+// AddSongInfo 添加新的歌曲
 func AddSongInfo(title string) bool {
 	var songInfo *model.SongInfo
 
@@ -31,6 +32,8 @@ func AddSongInfo(title string) bool {
 	return true
 }
 
+// QuerySongInfo 查询歌曲信息
+// TODO 还不能指定用户
 func QuerySongInfo(user string) ([]model.SongInfo, error) {
 	var songs []model.SongInfo
 	err := model.DB().Find(&songs).Error

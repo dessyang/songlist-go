@@ -8,7 +8,27 @@ import (
 
 var (
 	songsCache = make(map[string][]model.SongInfo)
+	cache      = make(map[string]interface{})
 )
+
+func IsExistCache() bool {
+	return false
+}
+
+func GetCache(key string) (interface{}, error) {
+	if c, ok := cache[key]; !ok {
+		return nil, errors.New("cache没有改值")
+	} else {
+		return c, nil
+	}
+}
+
+func SetCache(key string, value interface{}) error {
+	if IsExistCache() {
+		cache[key] = value
+	}
+	return nil
+}
 
 func IsExistSongsCache(key string) bool {
 	if GetSongsCache(key) != nil {

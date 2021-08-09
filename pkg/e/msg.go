@@ -10,6 +10,9 @@ var MsgFlags = map[int]string{
 	AuthFail:        "账号或密码错误",
 	SongNotFound:    "歌曲未找到",
 	PageNotNum:      "页码不是数字",
+	ParamNotNul:     "参数不能为空",
+	RepeatUser:      "用户名重复",
+	RepeatEmail:     "邮箱重复",
 }
 
 func GetMsg(code int) string {

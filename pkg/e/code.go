@@ -10,4 +10,7 @@ const (
 	PageOutBound
 	SongNotFound
 	PageNotNum
+	ParamNotNul
+	RepeatUser
+	RepeatEmail
 )

@@ -4,6 +4,8 @@ mode = "release"
 pageMaxNum = 10
 # jwt密钥
 jwtSecret = ""
+# 是否运行注册, 默认是禁止
+register = false
 [server]
 port = 8080
 [database]

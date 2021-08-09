@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/yjymh/songlist-go/conf"
+	"github.com/yjymh/songlist-go/model"
 	"github.com/yjymh/songlist-go/routers"
 	"github.com/yjymh/songlist-go/util"
 	"net/http"
 )
 
 func init() {
-	conf.Setup("")
+	conf.Setup("conf/test.toml")
 	util.Setup()
+	model.SetUp()
 }
 
 func main() {
