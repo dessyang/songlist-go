@@ -1,7 +1,8 @@
 package model
 
+// SetUp 初始化数据库表
 func SetUp() {
-	DB().AutoMigrate(UserSong{})
 	DB().AutoMigrate(Auth{})
-	DB().AutoMigrate(SongInfo{})
+	DB().AutoMigrate(Artist{})
+	DB().AutoMigrate(Song{})
 }

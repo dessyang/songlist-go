@@ -1,15 +1,14 @@
 [app]
+# release or debug
 mode = "release"
 # 页面最大展示数据
 pageMaxNum = 10
-# jwt密钥
-jwtSecret = ""
 # 是否运行注册, 默认是禁止
 register = false
 [server]
 port = 8080
 [database]
-# 数据库类型
+# 数据库类型 mysql or sqlite
 driver = "mysql"
 # sqlite
 fileName = "sqlite.db"

@@ -1,87 +1,108 @@
 package v1
 
 import (
+	"encoding/gob"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/yjymh/songlist-go/conf"
+	"github.com/yjymh/songlist-go/middleware"
 	"github.com/yjymh/songlist-go/model"
 	"github.com/yjymh/songlist-go/pkg/e"
-	"github.com/yjymh/songlist-go/service/auth_service"
+	service "github.com/yjymh/songlist-go/service"
 	"github.com/yjymh/songlist-go/util"
 	"net/http"
 )
 
-// Auth 权限管理
-// Router /api/v1/login/:method [post]
-func Auth(c *gin.Context) {
-	method := c.Param("method")
-	switch method {
-	case "login":
-		Login(c)
-	case "logout":
-		Logout(c)
-	case "register":
-		Register(c)
-	}
-	return
+func init() {
+	// 注册结构体,这样才能在session使用该结构体
+	// https://github.com/gin-contrib/sessions/issues/134
+	gob.Register(model.Auth{})
 }
 
 // Register 注册
 // Router /api/v1/login/register [post]
 func Register(c *gin.Context) {
 	R := model.R{}
-	// 用户名为 3 ~ n字母
+	if !conf.Conf.App.Register {
+		c.JSON(http.StatusOK, R.Result(e.RegistrationNotAllowed))
+		return
+	}
 	username := c.PostForm("username")
-	// 密码要求：
 	password := c.PostForm("password")
-	// 邮箱：56789@qq.com
 	email := c.PostForm("email")
-	// TODO 还需要验证用户名，密码，邮箱的格式，其余全部完工
 
-	// 参数不能为空
-	if username == "" || password == "" || email == "" {
-		c.JSON(http.StatusOK, R.Fail(e.ParamNotNul))
-		return
-	}
-	// 防止用户名重复
-	if auth_service.IsExistUsername(username) {
-		c.JSON(http.StatusOK, R.Fail(e.RepeatUser))
-		return
-	}
-	// 防止邮箱重复
-	if auth_service.IsExistEmail(email) {
-		c.JSON(http.StatusOK, R.Fail(e.RepeatEmail))
+	if util.IsEmpty(username) || util.IsEmpty(password) || util.IsEmpty(email) {
+		c.JSON(http.StatusOK, R.Result(e.MissParam))
 		return
 	}
 
-	flag, _ := auth_service.CreateAuthUser(username, password, email)
-	if flag {
-		c.JSON(http.StatusOK, R.Success("注册成功"))
-	} else {
-		c.JSON(http.StatusOK, R.Success("注册失败"))
+	if !util.IsUsername(username) {
+		c.JSON(http.StatusOK, R.Result(e.UsernameFormatError))
+		return
 	}
+	if !util.IsEmail(email) {
+		c.JSON(http.StatusOK, R.Result(e.EmailFormatError))
+		return
+	}
+	if !util.IsPassword(password) {
+		c.JSON(http.StatusOK, R.Result(e.PasswordFormatError))
+		return
+	}
+
+	if service.IsExistUsername(username) {
+		c.JSON(http.StatusOK, R.Result(e.RepeatUser))
+		return
+	}
+	if service.IsExistEmail(email) {
+		c.JSON(http.StatusOK, R.Result(e.RepeatEmail))
+		return
+	}
+	flag, err := service.CreateAuthUser(username, password, email)
+	if err != nil {
+		middleware.Logger().Error(err)
+	}
+	if !flag {
+		c.JSON(http.StatusOK, R.Result(e.Fail))
+		return
+	}
+	c.JSON(http.StatusOK, R.Success("注册成功"))
 }
 
 // Logout 注销
-// TODO JWT的注销还不知道怎么做
 func Logout(c *gin.Context) {
-	c.Request.Header.Get("x-token")
+	R := model.R{}
+	session := sessions.Default(c)
+	auth := session.Get("auth")
+	if auth != nil {
+		session.Clear()
+		session.Save()
+		c.JSON(http.StatusOK, R.Success("退出成功"))
+		return
+	}
+	c.JSON(http.StatusOK, R.Success("已经退出,无需重复操作"))
 }
 
 // Login 登录
 func Login(c *gin.Context) {
+	session := sessions.Default(c)
 	R := model.R{}
 
-	username := c.Param("username")
-	password := c.Param("password")
+	username := c.PostForm("username")
+	password := c.PostForm("password")
 
-	flag, _ := auth_service.Check(username, password)
-	if !flag {
-		c.JSON(http.StatusOK, R.Fail(e.AuthFail))
+	if util.IsEmpty(username) || util.IsEmpty(password) {
+		c.JSON(http.StatusOK, R.Result(e.MissParam))
 		return
 	}
-	token, err := util.GenerateToken(username, password)
-	if err != nil {
-		c.JSON(http.StatusOK, R.Fail(e.Fail))
+
+	auth, flag := service.CheckAuth(username, password)
+
+	if flag {
+		session.Set("auth", auth)
+		session.Save()
+		c.JSON(http.StatusOK, R.Success("登录成功"))
+		return
 	}
-	// 登录成功，进行下一步操作
-	c.JSON(http.StatusOK, R.Success(token))
+
+	c.JSON(http.StatusOK, R.Result(e.AuthFail))
 }

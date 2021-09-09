@@ -6,13 +6,11 @@ import (
 	"github.com/yjymh/songlist-go/conf"
 	"github.com/yjymh/songlist-go/model"
 	"github.com/yjymh/songlist-go/routers"
-	"github.com/yjymh/songlist-go/util"
 	"net/http"
 )
 
 func init() {
-	conf.Setup("conf/test.toml")
-	util.Setup()
+	conf.Setup("")
 	model.SetUp()
 }
 

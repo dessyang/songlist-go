@@ -23,7 +23,7 @@ type config struct {
 type app struct {
 	Mode       string `toml:"mode"`
 	PageMaxNum int    `toml:"pageMaxNum"`
-	JwtSecret  string `toml:"jwtSecret"`
+	Register   bool   `toml:"register"`
 }
 
 type server struct {
