@@ -2,8 +2,7 @@ package model
 
 import "gorm.io/gorm"
 
-type UserSong struct {
+type Artist struct {
 	gorm.Model
-	UserId int
-	SongId int
+	Name string
 }
