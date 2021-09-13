@@ -3,13 +3,14 @@ package service
 import (
 	"github.com/yjymh/songlist-go/middleware"
 	"github.com/yjymh/songlist-go/model"
+	"github.com/yjymh/songlist-go/util"
 )
 
 // CreateAuthUser 创建一个用户
 func CreateAuthUser(username, password, email string) (bool, error) {
 	auth := model.Auth{
 		Username: username,
-		Password: password,
+		Password: util.EncodeMD5(password),
 		Email:    email,
 	}
 	err := model.DB().Create(&auth).Error
@@ -42,7 +43,7 @@ func IsExistEmail(email string) bool {
 // CheckAuth 登录验证
 func CheckAuth(username, password string) (model.Auth, bool) {
 	flag := false
-	auth := model.Auth{Username: username, Password: password}
+	auth := model.Auth{Username: username, Password: util.EncodeMD5(password)}
 	err := model.DB().Where(&auth).First(&auth).Error
 	if err != nil {
 		middleware.Logger().Errorln(err)
