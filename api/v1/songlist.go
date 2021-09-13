@@ -71,7 +71,7 @@ func GetSongList(c *gin.Context) {
 
 	if random {
 		index := rand.Intn(songsNum)
-		c.JSON(http.StatusOK, resp[index])
+		c.JSON(http.StatusOK, R.Success("", resp[index]))
 		return
 	}
 	maxPage := util.MaxPage(len(songs), maxNum)
@@ -79,8 +79,8 @@ func GetSongList(c *gin.Context) {
 	lastNum := page * maxNum
 
 	// 判断访问的页数是否在总页数里面，根据不同情况输出不同数据
-	if page < 0 {
-
+	if page == 0 {
+		c.JSON(http.StatusOK, R.Success("", resp))
 	} else if page > maxPage {
 		c.JSON(http.StatusOK, R.Result(e.PageOutBound))
 	} else if page == maxPage {
